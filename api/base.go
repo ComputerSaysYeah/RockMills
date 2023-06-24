@@ -38,7 +38,7 @@ const (
 	Row7 Square = 6 * 8
 	Row8 Square = 7 * 8
 
-	Invalid Square = 255
+	None Square = 255
 	// i.e. Row6 + ColD = 6*8+3 = 51
 )
 
@@ -55,7 +55,17 @@ type Board interface {
 type Game interface {
 	speed.Recyclable
 	MoveNo() int
+	HalfMoveNo() int
 	MoveNext() Piece
+	EnPassant() Square
 	ValidMoves() speed.Iterator[Move]
 	Move(Move)
+	Castling() (WK, WQ, bk, bq bool)
+
+	Board() Board
+	SetMoveNo(int)
+	SetHalfMoveNo(int)
+	SetMoveNext(Piece)
+	SetEnPassant(Square)
+	SetCastling(WK, WQ, bk, bq bool)
 }

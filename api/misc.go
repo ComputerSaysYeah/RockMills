@@ -17,27 +17,70 @@ func (s Square) String() string {
 func ParseSquare(st string) Square {
 	ch := strings.ToLower(st)[0]
 	if ch < 'a' || ch > 'h' || st[1] < '1' || st[1] > '8' {
-		return Invalid
+		return None
 	}
 	return Square((ch - 'a') + ((st[1] - '1') * 8))
 }
 
 func (p Piece) String() string {
 	switch p {
-	case Black + Pawn, White + Pawn:
+	case Black + Pawn:
 		return "p"
-	case Black + Rook, White + Rook:
+	case White + Pawn:
+		return "P"
+	case Black + Rook:
 		return "r"
-	case Black + Knight, White + Knight:
-		return "k"
-	case Black + Bishop, White + Bishop:
+	case White + Rook:
+		return "R"
+	case Black + Knight:
+		return "n"
+	case White + Knight:
+		return "N"
+	case Black + Bishop:
 		return "b"
-	case Black + Queen, White + Queen:
+	case White + Bishop:
+		return "B"
+	case Black + Queen:
 		return "q"
-	case Black + King, White + King:
+	case White + Queen:
+		return "Q"
+	case Black + King:
 		return "k"
+	case White + King:
+		return "K"
 	default:
 		return "?"
+	}
+}
+
+func ParsePiece(ch rune) Piece {
+	switch ch {
+	case 'p':
+		return Black + Pawn
+	case 'P':
+		return White + Pawn
+	case 'r':
+		return Black + Rook
+	case 'R':
+		return White + Rook
+	case 'n':
+		return Black + Knight
+	case 'N':
+		return White + Knight
+	case 'b':
+		return Black + Bishop
+	case 'B':
+		return White + Bishop
+	case 'q':
+		return Black + Queen
+	case 'Q':
+		return White + Queen
+	case 'k':
+		return Black + King
+	case 'K':
+		return White + King
+	default:
+		return Empty
 	}
 }
 
