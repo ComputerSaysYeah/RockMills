@@ -7,8 +7,7 @@ import (
 )
 
 func TestGame_Start(t *testing.T) {
-	bp := speed.NewLeanPool(16, NewBoardB)
-	g := NewGame(bp)
+	g := NewGame(speed.NewLeanPool(16, NewBoardB), nil)
 
 	if g.MoveNo() != 1 {
 		t.Fatal()

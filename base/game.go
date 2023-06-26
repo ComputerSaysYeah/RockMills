@@ -4,6 +4,8 @@ import "github.com/ComputerSaysYeah/RookMills/speed"
 import . "github.com/ComputerSaysYeah/RookMills/api"
 
 type gameSt struct {
+	speed.Recyclable
+
 	board          Board
 	moveNo         int
 	halfMoveNo     int
@@ -11,25 +13,28 @@ type gameSt struct {
 	enPassant      Square
 	WK, WQ, bk, bq bool // castling
 
-	boardPool speed.Pool[Board]
-	returner  func(any)
+	boardPool     speed.Pool[Board]
+	movesIterPool speed.Pool[MovesIterator]
+
+	returner func(any)
 }
 
-func NewGame(boardPool speed.Pool[Board]) Game {
+func NewGame(boardPool speed.Pool[Board], movesIterPool speed.Pool[MovesIterator]) Game {
 	board := boardPool.Lease()
 	board.SetStartingPieces()
 	return &gameSt{
-		board:      board,
-		moveNo:     1,
-		halfMoveNo: 0,
-		nextPlayer: White,
-		enPassant:  None,
-		WK:         true,
-		WQ:         true,
-		bk:         true,
-		bq:         true,
-		boardPool:  boardPool,
-		returner:   nil}
+		board:         board,
+		moveNo:        1,
+		halfMoveNo:    0,
+		nextPlayer:    White,
+		enPassant:     None,
+		WK:            true,
+		WQ:            true,
+		bk:            true,
+		bq:            true,
+		boardPool:     boardPool,
+		movesIterPool: movesIterPool,
+		returner:      nil}
 }
 
 func (g *gameSt) Reset() {
@@ -50,10 +55,6 @@ func (g *gameSt) HalfMoveNo() int {
 
 func (g *gameSt) MoveNext() Piece {
 	return g.nextPlayer
-}
-
-func (g *gameSt) ValidMoves() speed.Iterator[Move] {
-	return nil
 }
 
 func (g *gameSt) EnPassant() Square {

@@ -14,8 +14,8 @@ const (
 	Knight Piece = 2
 	Bishop Piece = 3
 	Rook   Piece = 4
-	Queen  Piece = 6
-	King   Piece = 7
+	Queen  Piece = 5
+	King   Piece = 6
 
 	Black Piece = 0 // i.e. Black Queen = 0 + 6 = 6  (0000_0110)
 	White Piece = 8 // i.e. White Queen = 8 + 6 = 14 (0000_1110)
@@ -38,7 +38,11 @@ const (
 	Row7 Square = 6 * 8
 	Row8 Square = 7 * 8
 
+	OneRow Square = 8
+
 	None Square = 255
+	A1   Square = 0
+	H8   Square = Row8 + ColH
 	// i.e. Row6 + ColD = 6*8+3 = 51
 )
 
@@ -46,7 +50,7 @@ type Board interface {
 	speed.Recyclable
 	Get(Square) Piece
 	Set(Square, Piece)
-	CopyFrom(*Board)
+	CopyFrom(Board)
 	Hash() uint64
 	SetStartingPieces()
 	String() string
@@ -58,7 +62,7 @@ type Game interface {
 	HalfMoveNo() int
 	MoveNext() Piece
 	EnPassant() Square
-	ValidMoves() speed.Iterator[Move]
+	ValidMoves() MovesIterator
 	Move(Move)
 	Castling() (WK, WQ, bk, bq bool)
 

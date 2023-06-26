@@ -9,7 +9,7 @@ import (
 )
 
 func TestParseFENStr(t *testing.T) {
-	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB))
+	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB), nil)
 	if err := ParseFEN(g, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); err != nil {
 		log.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestParseFENStr(t *testing.T) {
 }
 
 func TestParseFENEnPassant(t *testing.T) {
-	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB))
+	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB), nil)
 	if err := ParseFEN(g, "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"); err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestParseFENEnPassant(t *testing.T) {
 }
 
 func TestParseFENAdvanced(t *testing.T) {
-	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB))
+	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB), nil)
 	if err := ParseFEN(g, "8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50"); err != nil {
 		log.Fatal(err)
 	}

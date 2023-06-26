@@ -39,6 +39,7 @@ func NewBoardB() Board {
 func (b *BoardB) Get(s Square) Piece {
 	return b.squares[s]
 }
+
 func (b *BoardB) Set(s Square, p Piece) {
 	b.squares[s] = p
 }
@@ -108,8 +109,8 @@ func (b *BoardB) String() string {
 	return res
 }
 
-func (b *BoardB) CopyFrom(o *Board) {
-	copy(b.squares[:], (*o).(*BoardB).squares[:])
+func (b *BoardB) CopyFrom(o Board) {
+	copy(b.squares[:], o.(*BoardB).squares[:])
 }
 
 func (b *BoardB) Reset() {

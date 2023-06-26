@@ -6,7 +6,7 @@ import (
 
 func TestNewExpRingBuffer_Basics(t *testing.T) {
 	rb := NewExpRingBuffer[int](0)
-	if !rb.Empty() {
+	if !rb.IsEmpty() {
 		t.Fatal("it should be empty at start")
 	}
 	if rb.Remaining() != 15 {
@@ -30,14 +30,14 @@ func TestNewExpRingBuffer_Basics(t *testing.T) {
 	}
 
 	for i := 0; i < 31; i++ {
-		if rb.Full() {
+		if rb.IsFull() {
 			t.Fatal("it should not be full!")
 		}
 		rb.Push(i)
 		if rb.Remaining() != 30-i {
 			t.Fatal("there should be the correct amount of available slots")
 		}
-		if rb.Empty() {
+		if rb.IsEmpty() {
 			t.Fatal("it should not be empty!")
 		}
 	}
@@ -55,8 +55,19 @@ func TestNewExpRingBuffer_Basics(t *testing.T) {
 			t.Fatal("availability should be expanding")
 		}
 	}
-	if !rb.Empty() {
+	if !rb.IsEmpty() {
 		t.Fatal("It should be empty!")
+	}
+
+	for i := 0; i < 10; i++ {
+		rb.Push(i)
+	}
+	if rb.IsEmpty() || rb.Used() != 10 {
+		t.Fatal("should not be empty not space should be 10")
+	}
+	rb.Reset()
+	if !rb.IsEmpty() || rb.Capacity() != 32 {
+		t.Fatal("it should be empty now")
 	}
 }
 
@@ -66,7 +77,7 @@ func TestExpRingBufferSt_ExpandBy(t *testing.T) {
 	if rb.Remaining() != 49 {
 		t.Fatal("it should have been expanded")
 	}
-	if !rb.Empty() {
+	if !rb.IsEmpty() {
 		t.Fatal("it is definitely empty!")
 	}
 	for i := 0; i < 40; i++ {
@@ -78,7 +89,7 @@ func TestExpRingBufferSt_ExpandBy(t *testing.T) {
 			t.Fatal("it should have pop out the value after expanding")
 		}
 	}
-	if !rb.Empty() {
+	if !rb.IsEmpty() {
 		t.Fatal("should be empty by now")
 	}
 	if rb.Remaining() != rb.Capacity()-1 && rb.Capacity() != 89 {

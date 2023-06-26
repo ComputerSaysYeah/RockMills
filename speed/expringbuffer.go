@@ -10,8 +10,9 @@ type ExpRingBuffer[t any] interface {
 	Capacity() int
 	Remaining() int
 	Used() int
-	Empty() bool
-	Full() bool
+	IsEmpty() bool
+	IsFull() bool
+	Reset()
 	ExpandBy(int)
 }
 
@@ -31,8 +32,8 @@ func NewExpRingBuffer[t any](initialCapacity int) ExpRingBuffer[t] {
 }
 
 func (e *expRingBufferSt[t]) Push(v t) {
-	if e.Full() {
-		log.Fatalln("ExpRingBuffer should not be full in order to Push() an element. check Full() first.")
+	if e.IsFull() {
+		log.Fatalln("ExpRingBuffer should not be full in order to Push() an element. check IsFull() first.")
 	}
 	e.buffer[e.head] = v
 	e.head++
@@ -42,14 +43,19 @@ func (e *expRingBufferSt[t]) Push(v t) {
 }
 
 func (e *expRingBufferSt[t]) Pop() t {
-	if e.Empty() {
-		log.Fatalln("ExpRingBuffer should not be empty in order to Pop() an element. check Empty() first.")
+	if e.IsEmpty() {
+		log.Fatalln("ExpRingBuffer should not be empty in order to Pop() an element. check IsEmpty() first.")
 	}
 	e.tail++
 	if e.tail == e.Capacity() {
 		e.tail = 0
 	}
 	return e.buffer[e.tail]
+}
+
+func (e *expRingBufferSt[t]) Reset() {
+	e.head = 0
+	e.tail = e.Capacity() - 1
 }
 
 func (e *expRingBufferSt[t]) Capacity() int {
@@ -64,18 +70,18 @@ func (e *expRingBufferSt[t]) Used() int {
 	return e.Capacity() - e.Remaining() - 1
 }
 
-func (e *expRingBufferSt[t]) Empty() bool {
+func (e *expRingBufferSt[t]) IsEmpty() bool {
 	return (e.tail+1)%e.Capacity() == e.head
 }
 
-func (e *expRingBufferSt[t]) Full() bool {
+func (e *expRingBufferSt[t]) IsFull() bool {
 	return e.tail == e.head
 }
 
 func (e *expRingBufferSt[t]) ExpandBy(more int) {
 	newBuffer := make([]t, e.Capacity()+more)
 	next := 0
-	for !e.Empty() {
+	for !e.IsEmpty() {
 		newBuffer[next] = e.Pop()
 		next++
 	}

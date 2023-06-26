@@ -38,7 +38,7 @@ func (lp *leanPool[v]) Flying() int {
 }
 
 func (lp *leanPool[v]) Lease() v {
-	if lp.objects.Empty() {
+	if lp.objects.IsEmpty() {
 		elem := lp.factory()
 		elem.SetReturnerFn(func(val any) { lp.Release(val.(v)) })
 		lp.objects.Push(elem)
@@ -51,7 +51,7 @@ func (lp *leanPool[v]) Lease() v {
 }
 
 func (lp *leanPool[v]) Release(val v) {
-	if lp.objects.Full() {
+	if lp.objects.IsFull() {
 		log.Printf("pool of %v ringbuffer is expanding from %d to %d\n", reflect.TypeOf(val), lp.objects.Capacity(), lp.objects.Capacity()*2)
 		lp.objects.ExpandBy(lp.objects.Capacity() * 2)
 	}

@@ -36,7 +36,7 @@ func TestBoardB_CopyFrom(t *testing.T) {
 	a.Set(Row2+ColD, Rook)
 
 	b := NewBoardB()
-	b.CopyFrom(&a)
+	b.CopyFrom(a)
 
 	if a.Hash() != b.Hash() {
 		log.Fatal()
