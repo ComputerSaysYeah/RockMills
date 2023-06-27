@@ -1,20 +1,19 @@
-package util
+package base
 
 import (
 	. "github.com/ComputerSaysYeah/RookMills/api"
-	"github.com/ComputerSaysYeah/RookMills/base"
 	"github.com/ComputerSaysYeah/RookMills/speed"
 	"log"
 	"testing"
 )
 
 func TestParseFENStr(t *testing.T) {
-	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB), nil)
-	if err := ParseFEN(g, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); err != nil {
+	g := NewGame(speed.NewLeanPool(16, NewBoardB), nil)
+	if err := g.FromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); err != nil {
 		log.Fatal(err)
 	}
 
-	b := base.NewBoardB()
+	b := NewBoardB()
 	b.SetStartingPieces()
 	if g.Board().Hash() != b.Hash() {
 		log.Fatalf("it should have been equal to a brand new laid out board board, got: \n%v\n", g.Board().String())
@@ -38,8 +37,8 @@ func TestParseFENStr(t *testing.T) {
 }
 
 func TestParseFENEnPassant(t *testing.T) {
-	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB), nil)
-	if err := ParseFEN(g, "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"); err != nil {
+	g := NewGame(speed.NewLeanPool(16, NewBoardB), nil)
+	if err := g.FromFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"); err != nil {
 		log.Fatal(err)
 	}
 
@@ -64,8 +63,8 @@ func TestParseFENEnPassant(t *testing.T) {
 }
 
 func TestParseFENAdvanced(t *testing.T) {
-	g := base.NewGame(speed.NewLeanPool(16, base.NewBoardB), nil)
-	if err := ParseFEN(g, "8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50"); err != nil {
+	g := NewGame(speed.NewLeanPool(16, NewBoardB), nil)
+	if err := g.FromFEN("8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50"); err != nil {
 		log.Fatal(err)
 	}
 
@@ -91,4 +90,14 @@ func TestParseFENAdvanced(t *testing.T) {
 		log.Fatal("it should be move 50")
 	}
 
+}
+
+func TestFENRoundTrip(t *testing.T) {
+	g := NewGame(speed.NewLeanPool(16, NewBoardB), nil)
+	if err := g.FromFEN("r7/4r3/1qbk1n2/3p4/4P3/2NK1BQ1/3R4/7R b - - 0 1"); err != nil {
+		log.Fatal(err)
+	}
+	if g.ToFEN() != "r7/4r3/1qbk1n2/3p4/4P3/2NK1BQ1/3R4/7R b - - 0 1" {
+		t.Fatalf("we didn't get quite exactly \"r7/4r3/1qbk1n2/3p4/4P3/2NK1BQ1/3R4/7R b - - 0 1\", but: \"%v\"", g.ToFEN())
+	}
 }

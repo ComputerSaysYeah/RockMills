@@ -72,4 +72,7 @@ type Game interface {
 	SetMoveNext(Piece)
 	SetEnPassant(Square)
 	SetCastling(WK, WQ, bk, bq bool)
+
+	ToFEN() string
+	FromFEN(string) error
 }
