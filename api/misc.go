@@ -12,8 +12,12 @@ func (m Move) Promote() Piece {
 	return Piece((m & 0x7000) >> 12)
 }
 
-func EncodeMove(from, to Square, promote Piece) Move {
+func EncodeMovePromote(from, to Square, promote Piece) Move {
 	return Move(to) | Move(from)<<6 | Move(promote)<<12
+}
+
+func EncodeMove(from, to Square) Move {
+	return Move(to) | Move(from)<<6
 }
 
 func (m Move) String() string {
@@ -26,7 +30,7 @@ func (m Move) String() string {
 
 func ParseMove(move string) Move {
 	if len(move) < 4 || len(move) > 5 {
-		return EncodeMove(None, None, Empty)
+		return EncodeMove(None, None)
 	}
 	from := ParseSquare(move[0:2])
 	to := ParseSquare(move[2:4])
@@ -34,7 +38,7 @@ func ParseMove(move string) Move {
 	if len(move) == 5 {
 		piece = ParsePiece(rune(move[4]))
 	}
-	return EncodeMove(from, to, piece)
+	return EncodeMovePromote(from, to, piece)
 }
 
 func Abs8(val int8) int8 {

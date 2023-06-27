@@ -82,7 +82,8 @@ func (p Piece) IsAttack(b Board, move Move) bool {
 		return p.isRookAttack(b, move)
 	} else if p.IsQueen() {
 		return p.isQueenAttack(b, move)
-
+	} else if p.IsKing() {
+		return p.isKingAttack(b, move)
 	}
 	return false
 }
@@ -176,6 +177,13 @@ func (p Piece) isQueenAttack(b Board, move Move) bool {
 	}
 
 	return true
+}
+
+func (p Piece) isKingAttack(b Board, move Move) bool {
+	if b.Get(move.From()).Colour() != b.Get(move.To()).Opponent() {
+		return false
+	}
+	return Abs8(int8(move.From().Row())-int8(move.To().Row())) <= 8 && Abs8(int8(move.From().Col())-int8(move.To().Col())) <= 1
 }
 
 func ParsePiece(ch rune) Piece {

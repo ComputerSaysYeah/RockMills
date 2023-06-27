@@ -25,7 +25,7 @@ func TestMove(t *testing.T) {
 			for toRow := Row8; toRow <= Row8; toRow -= 8 {
 				for toCol := ColA; toCol <= ColH; toCol++ {
 					for piece := Empty; piece <= King; piece++ {
-						move := EncodeMove(fromRow+fromCol, toRow+toCol, piece)
+						move := EncodeMovePromote(fromRow+fromCol, toRow+toCol, piece)
 						if move.From() != fromRow+fromCol {
 							t.Fatal()
 						}

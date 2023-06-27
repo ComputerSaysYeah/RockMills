@@ -3,7 +3,6 @@ package base
 import (
 	. "github.com/ComputerSaysYeah/RookMills/api"
 	"github.com/ComputerSaysYeah/RookMills/speed"
-	"github.com/ComputerSaysYeah/RookMills/util"
 	"testing"
 )
 
@@ -25,9 +24,38 @@ func TestMoveGen_2ndMove(t *testing.T) {
 
 func TestMoveGen_Advanced(t *testing.T) {
 	game := givenGame() // https://lichess.org/editor/r7/4r3/1qbk1n2/3p4/4P3/2N1KBQ1/3R4/7R_w_-_-_0_1?color=white
-	_ = util.ParseFEN(game, "r7/4r3/1qbk1n2/3p4/4P3/2N1KBQ1/3R4/7R w - - 0 1")
+	_ = game.FromFEN("r7/4r3/1qbk1n2/3p4/4P3/2N1KBQ1/3R4/7R w - - 0 1")
 	containsMovesExactly(t, validMoves(game), "d2d4", "e3e2", "e3f4", "e3d3") // only options is about escaping the check
+
+	//game.Move(ParseMove("d2d4")) // r7/4r3/1qbk1n2/3p4/4P3/2NK1BQ1/3R4/7R b - - 0 1
+	//containsMovesExactly(t, validMoves(game), "d6d7", "d6e6", "d6c5", "e7e5") // only options is about escaping the check
 }
+
+func TestMoveGen_RookKing(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("2r5/8/8/3k4/3K4/8/8/4R3 w - - 0 1")
+	containsMovesExactly(t, validMoves(game), "d4d3", "d4e3", "d4d5") // d4d5=king eats king ... hmm... fair enough
+	game.SetMoveNext(Black)
+	containsMovesExactly(t, validMoves(game), "d5d6", "d5d4", "d5c6")
+}
+
+func TestMoveGen_Kings(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("8/8/3k4/8/3K4/8/8/8 w - - 0 1")
+	containsMovesExactly(t, validMoves(game), "d4e4", "d4e3", "d4d3", "d4c3", "d4c4")
+	game.SetMoveNext(Black)
+	containsMovesExactly(t, validMoves(game), "d6d7", "d6e7", "d6e6", "d6c6", "d6c7")
+}
+
+func TestMoveGen_Pawns(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("7k/8/8/3p4/4P3/8/8/K7 w - - 0 1")
+	containsMovesExactly(t, validMoves(game) /* king */, "a1a2", "a1b2", "a1b1" /* pawn */, "e4e5", "e4d5")
+	game.SetMoveNext(Black)
+	containsMovesExactly(t, validMoves(game) /* king */, "h8h7", "h8g7", "h8g8" /* pawn */, "d5e4", "d5d4")
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------------------
 
 func givenGame() Game {
 	return NewGame(
