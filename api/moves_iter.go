@@ -12,7 +12,6 @@ type MovesIterator interface {
 }
 
 type movesIter struct {
-	MovesIterator
 	moves    speed.ExpRingBuffer[Move]
 	returned func(any)
 }

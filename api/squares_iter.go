@@ -12,7 +12,6 @@ type SquaresIterator interface {
 }
 
 type squaresIter struct {
-	SquaresIterator
 	squares  speed.ExpRingBuffer[Square]
 	returned func(any)
 }

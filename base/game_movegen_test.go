@@ -62,6 +62,24 @@ func TestMoveGen_PawnsPromotion(t *testing.T) {
 	game.SetMoveNext(Black)
 	containsMovesExactly(t, validMoves(game) /* king */, "H8H7", "H8G7", "H8G8" /* pawn */, "D2D1q", "D2D1b", "D2D1n", "D2D1r")
 }
+func TestMoveGen_PawnsPromotion_NoKings(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("8/4P3/8/8/8/8/3p4/8 w - - 0 1")
+	containsMovesExactly(t, validMoves(game), "E7E8Q", "E7E8B", "E7E8N", "E7E8R")
+	game.SetMoveNext(Black)
+	containsMovesExactly(t, validMoves(game), "D2D1q", "D2D1b", "D2D1n", "D2D1r")
+}
+
+func TestMoveGen_CheckMate(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("rk5Q/pppp4/8/8/8/8/8/8 w - - 0 1")
+	containsMovesExactly(t, validMoves(game), "H8B8",
+		"H8H7", "H8H6", "H8H5", "H8H4", "H8H3", "H8H2", "H8H1",
+		"H8G8", "H8F8", "H8E8", "H8D8", "H8C8",
+		"H8G7", "H8F6", "H8E5", "H8D4", "H8C3", "H8B2", "H8A1")
+	game.SetMoveNext(Black)
+	containsMovesExactly(t, validMoves(game))
+}
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
 

@@ -179,6 +179,7 @@ func (p Piece) canQueenAttack(b Board, move Move) bool {
 				}
 			}
 		}
+		return true
 	}
 	// diagonals, like bishops
 	// fast check if abs(delta rows) != abs(delta cols) => no

@@ -2,14 +2,15 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 )
 
 func (s Square) String() string {
-	if s > 63 {
-		log.Fatal("square out of range")
+	if s.IsNone() {
+		return "None"
+	} else if s > 63 {
+		return "!Invalid"
 	}
 	return fmt.Sprintf("%c", rune(65+uint8(s)%8)) + strconv.Itoa((int(s)/8)+1)
 }
