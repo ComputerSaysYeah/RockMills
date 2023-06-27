@@ -55,6 +55,14 @@ func TestMoveGen_Pawns(t *testing.T) {
 	containsMovesExactly(t, validMoves(game) /* king */, "h8h7", "h8g7", "h8g8" /* pawn */, "d5e4", "d5d4")
 }
 
+func TestMoveGen_PawnsPromotion(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("7k/4P3/8/8/8/8/3p4/K7 w - - 0 1")
+	containsMovesExactly(t, validMoves(game) /* king */, "A1A2", "A1B2", "A1B1" /* pawn */, "E7E8Q", "E7E8B", "E7E8N", "E7E8R")
+	game.SetMoveNext(Black)
+	containsMovesExactly(t, validMoves(game) /* king */, "H8H7", "H8G7", "H8G8" /* pawn */, "D2D1q", "D2D1b", "D2D1n", "D2D1r")
+}
+
 // ---------------------------------------------------------------------------------------------------------------------------------------
 
 func givenGame() Game {

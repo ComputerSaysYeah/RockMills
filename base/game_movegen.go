@@ -38,7 +38,7 @@ func (g *gameSt) validMovesPieceIn(square Square, piece Piece, movesIter MovesIt
 }
 
 func (g *gameSt) validPawnMoves(square Square, piece Piece, iter MovesIterator) {
-	if piece.Colour() == Black {
+	if piece.Colour() == Black && square.Row() != Row2 { // so no promotion
 		move := EncodeMove(square, square.S())
 		if g.board.Get(move.To()) == Empty {
 			if !g.wouldCheckKing(piece.Colour(), move) {
@@ -51,7 +51,7 @@ func (g *gameSt) validPawnMoves(square Square, piece Piece, iter MovesIterator) 
 				}
 			}
 		}
-	} else {
+	} else if piece.Colour() == White && square.Row() != Row7 { // so no promotion
 		move := EncodeMove(square, square.N())
 		if g.board.Get(move.To()) == Empty {
 			if !g.wouldCheckKing(piece.Colour(), move) {
@@ -93,12 +93,12 @@ func (g *gameSt) validPawnPromotes(square Square, piece Piece, iter MovesIterato
 		}
 	} else {
 		move := EncodeMove(square, square.N())
-		if square.Row() == Row8 && g.board.Get(move.To()).IsEmpty() {
+		if square.Row() == Row7 && g.board.Get(move.To()).IsEmpty() {
 			if !g.wouldCheckKing(piece.Colour(), move) {
-				iter.Add(EncodeMovePromote(move.From(), move.To(), Queen))
-				iter.Add(EncodeMovePromote(move.From(), move.To(), Rook))
-				iter.Add(EncodeMovePromote(move.From(), move.To(), Bishop))
-				iter.Add(EncodeMovePromote(move.From(), move.To(), Knight))
+				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Queen))
+				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Rook))
+				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Bishop))
+				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Knight))
 
 			}
 		}

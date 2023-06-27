@@ -9,7 +9,7 @@ func (m Move) From() Square {
 }
 
 func (m Move) Promote() Piece {
-	return Piece((m & 0x7000) >> 12)
+	return Piece((m & 0xF000) >> 12)
 }
 
 func EncodeMovePromote(from, to Square, promote Piece) Move {
