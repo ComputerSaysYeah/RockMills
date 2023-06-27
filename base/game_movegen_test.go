@@ -68,7 +68,8 @@ func TestMoveGen_PawnsPromotion(t *testing.T) {
 func givenGame() Game {
 	return NewGame(
 		speed.NewLeanPool(16, NewBoardB),
-		speed.NewLeanPool(16, NewMovesIterator))
+		speed.NewLeanPool(16, NewMovesIterator),
+		speed.NewLeanPool(32, NewSquaresIterator))
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------------

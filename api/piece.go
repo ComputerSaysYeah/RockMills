@@ -75,20 +75,44 @@ func (p Piece) IsEmpty() bool {
 	return p == Empty
 }
 
-func (p Piece) IsAttack(b Board, move Move) bool {
+func (p Piece) Pawn() Piece {
+	return p.Colour() + Pawn
+}
+
+func (p Piece) Rook() Piece {
+	return p.Colour() + Rook
+}
+
+func (p Piece) Knight() Piece {
+	return p.Colour() + Knight
+}
+
+func (p Piece) Bishop() Piece {
+	return p.Colour() + Bishop
+}
+
+func (p Piece) Queen() Piece {
+	return p.Colour() + Queen
+}
+
+func (p Piece) King() Piece {
+	return p.Colour() + King
+}
+
+func (p Piece) CanAttack(b Board, move Move) bool {
 	if p.IsPawn() {
-		return p.isPawnAttack(b, move)
+		return p.canPawnAttack(b, move)
 	} else if p.IsRook() {
-		return p.isRookAttack(b, move)
+		return p.canRookAttack(b, move)
 	} else if p.IsQueen() {
-		return p.isQueenAttack(b, move)
+		return p.canQueenAttack(b, move)
 	} else if p.IsKing() {
-		return p.isKingAttack(b, move)
+		return p.canKingAttack(b, move)
 	}
 	return false
 }
 
-func (p Piece) isPawnAttack(b Board, move Move) bool {
+func (p Piece) canPawnAttack(b Board, move Move) bool {
 	if p.Colour() == Black {
 		to := move.From().S().W()
 		if to == move.To() && b.Get(to) == White {
@@ -111,7 +135,7 @@ func (p Piece) isPawnAttack(b Board, move Move) bool {
 	return false
 }
 
-func (p Piece) isRookAttack(b Board, move Move) bool {
+func (p Piece) canRookAttack(b Board, move Move) bool {
 	if move.From().Row() != move.To().Row() && move.From().Col() != move.To().Col() {
 		return false
 	}
@@ -133,7 +157,7 @@ func (p Piece) isRookAttack(b Board, move Move) bool {
 	return true
 }
 
-func (p Piece) isQueenAttack(b Board, move Move) bool {
+func (p Piece) canQueenAttack(b Board, move Move) bool {
 	// quick check, not same colour? out
 	if b.Get(move.From()).Colour() != b.Get(move.To()).Opponent() {
 		return false
@@ -179,7 +203,7 @@ func (p Piece) isQueenAttack(b Board, move Move) bool {
 	return true
 }
 
-func (p Piece) isKingAttack(b Board, move Move) bool {
+func (p Piece) canKingAttack(b Board, move Move) bool {
 	if b.Get(move.From()).Colour() != b.Get(move.To()).Opponent() {
 		return false
 	}

@@ -69,14 +69,14 @@ func (g *gameSt) validPawnMoves(square Square, piece Piece, iter MovesIterator) 
 
 func (g *gameSt) validPawnCaptures(square Square, piece Piece, iter MovesIterator) {
 	//XXX: en-passant here
-	attacks := []Square{square.E(), square.W()}
-	for i := 0; i < len(attacks); i++ {
-		if piece.Colour() == Black {
-			attacks[i] = attacks[i].S()
-		} else {
-			attacks[i] = attacks[i].N()
-		}
+	aEast, aWest := square.E(), square.W()
+	if piece.Colour() == Black {
+		aEast, aWest = aEast.S(), aWest.S()
+	} else {
+		aEast, aWest = aEast.N(), aWest.N()
 	}
+	attacks := g.squaresIterPool.Lease()
+	attacks.Add(aWest).Add(aEast)
 	g.validGenericCapture(square, attacks, piece, iter)
 }
 
@@ -139,14 +139,14 @@ func (g *gameSt) validRookCaptures(square Square, piece Piece, iter MovesIterato
 }
 
 func (g *gameSt) validKnightMovesAndCaptures(square Square, piece Piece, iter MovesIterator) {
-	g.validGenericMoveAndCapture(square,
-		[]Square{
-			square.N().N().W(), square.N().N().E(),
-			square.E().E().N(), square.E().E().S(),
-			square.S().S().E(), square.S().S().W(),
-			square.W().W().S(), square.W().W().N(),
-		},
-		piece, iter)
+	targets := g.squaresIterPool.Lease()
+	defer targets.Return()
+	targets.
+		Add(square.N().N().W()).Add(square.N().N().E()).
+		Add(square.E().E().N()).Add(square.E().E().S()).
+		Add(square.S().S().E()).Add(square.S().S().W()).
+		Add(square.W().W().S()).Add(square.W().W().N())
+	g.validGenericMoveAndCapture(square, targets, piece, iter)
 }
 
 func (g *gameSt) validBishopMoves(square Square, piece Piece, iter MovesIterator) {
@@ -165,13 +165,23 @@ func (g *gameSt) validQueenCaptures(square Square, piece Piece, iter MovesIterat
 }
 
 func (g *gameSt) validKingMovesAndCaptures(square Square, piece Piece, iter MovesIterator) {
-	g.validGenericMoveAndCapture(square,
-		[]Square{square.N(), square.N().E(), square.E(), square.E().S(), square.S(), square.S().W(), square.W(), square.W().N()},
-		piece, iter)
+	targets := g.squaresIterPool.Lease()
+	defer targets.Return()
+	targets.
+		Add(square.N()).
+		Add(square.N().E()).
+		Add(square.E()).
+		Add(square.E().S()).
+		Add(square.S()).
+		Add(square.S().W()).
+		Add(square.W()).
+		Add(square.W().N())
+	g.validGenericMoveAndCapture(square, targets, piece, iter)
 }
 
-func (g *gameSt) validGenericMoveAndCapture(square Square, targets []Square, piece Piece, iter MovesIterator) {
-	for _, target := range targets {
+func (g *gameSt) validGenericMoveAndCapture(square Square, targets SquaresIterator, piece Piece, iter MovesIterator) {
+	for targets.HasNext() {
+		target := targets.Next()
 		if target != None && (g.board.Get(target) == Empty || g.board.Get(target).Colour() == piece.Opponent()) {
 			move := EncodeMove(square, target)
 			if !g.wouldCheckKing(piece.Colour(), move) {
@@ -181,8 +191,9 @@ func (g *gameSt) validGenericMoveAndCapture(square Square, targets []Square, pie
 	}
 }
 
-func (g *gameSt) validGenericCapture(square Square, targets []Square, piece Piece, iter MovesIterator) {
-	for _, target := range targets {
+func (g *gameSt) validGenericCapture(square Square, targets SquaresIterator, piece Piece, iter MovesIterator) {
+	for targets.HasNext() {
+		target := targets.Next()
 		if !target.IsNone() && !g.board.Get(target).IsEmpty() && g.board.Get(target).Colour() == piece.Opponent() {
 			move := EncodeMove(square, target)
 			if !g.wouldCheckKing(piece.Colour(), move) {
@@ -206,7 +217,7 @@ func (g *gameSt) wouldCheckKing(kingColour Piece, move Move) bool {
 	b.Set(move.From(), Empty)
 
 	// find the King
-	kingPiece := kingColour + King
+	kingPiece := kingColour.King()
 	kingSquare := None
 	for s := A1; s < H8 && kingSquare == None; s++ {
 		if b.Get(s) == kingPiece {
@@ -216,9 +227,9 @@ func (g *gameSt) wouldCheckKing(kingColour Piece, move Move) bool {
 
 	// know, we check every opponents' piece for potential attack
 	for s := A1; s < H8; s++ {
-		thisSquare := b.Get(s)
-		if !thisSquare.IsEmpty() && thisSquare.Colour() != kingColour {
-			if thisSquare.IsAttack(b, EncodeMove(s, kingSquare)) {
+		piece := b.Get(s)
+		if !piece.IsEmpty() && piece.Colour() != kingColour {
+			if piece.CanAttack(b, EncodeMove(s, kingSquare)) {
 				return true
 			}
 		}

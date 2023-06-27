@@ -13,28 +13,32 @@ type gameSt struct {
 	enPassant      Square
 	WK, WQ, bk, bq bool // castling
 
-	boardPool     speed.Pool[Board]
-	movesIterPool speed.Pool[MovesIterator]
+	boardPool       speed.Pool[Board]
+	movesIterPool   speed.Pool[MovesIterator]
+	squaresIterPool speed.Pool[SquaresIterator]
 
 	returner func(any)
 }
 
-func NewGame(boardPool speed.Pool[Board], movesIterPool speed.Pool[MovesIterator]) Game {
+func NewGame(boardPool speed.Pool[Board],
+	movesIterPool speed.Pool[MovesIterator],
+	squaresIterPool speed.Pool[SquaresIterator]) Game {
 	board := boardPool.Lease()
 	board.SetStartingPieces()
 	return &gameSt{
-		board:         board,
-		moveNo:        1,
-		halfMoveNo:    0,
-		nextPlayer:    White,
-		enPassant:     None,
-		WK:            true,
-		WQ:            true,
-		bk:            true,
-		bq:            true,
-		boardPool:     boardPool,
-		movesIterPool: movesIterPool,
-		returner:      nil}
+		board:           board,
+		moveNo:          1,
+		halfMoveNo:      0,
+		nextPlayer:      White,
+		enPassant:       None,
+		WK:              true,
+		WQ:              true,
+		bk:              true,
+		bq:              true,
+		boardPool:       boardPool,
+		movesIterPool:   movesIterPool,
+		squaresIterPool: squaresIterPool,
+		returner:        nil}
 }
 
 func (g *gameSt) Reset() {

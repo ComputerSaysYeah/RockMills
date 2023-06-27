@@ -8,7 +8,7 @@ import (
 type MovesIterator interface {
 	speed.Iterator[Move]
 	speed.Recyclable
-	Add(Move)
+	Add(Move) MovesIterator
 }
 
 type movesIter struct {
@@ -41,9 +41,10 @@ func (m *movesIter) Next() Move {
 	return m.moves.Pop()
 }
 
-func (m *movesIter) Add(move Move) {
+func (m *movesIter) Add(move Move) MovesIterator {
 	if m.moves.IsFull() {
 		m.moves.ExpandBy(m.moves.Capacity())
 	}
 	m.moves.Push(move)
+	return m
 }
