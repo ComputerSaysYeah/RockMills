@@ -23,7 +23,7 @@ func ParseSquare(st string) Square {
 }
 
 func (s Square) Row() Square {
-	return s / 8
+	return s & 0xf8
 }
 
 func (s Square) Col() Square {
@@ -45,14 +45,14 @@ func (s Square) Max(o Square) Square {
 }
 
 func (s Square) N() Square {
-	if s == None || s.Row() == 7 {
+	if s == None || s.Row() == Row8 {
 		return None
 	}
 	return s + OneRow
 }
 
 func (s Square) S() Square {
-	if s == None || s.Row() == 0 {
+	if s == None || s.Row() == Row1 {
 		return None
 	}
 	return s - OneRow
@@ -70,4 +70,8 @@ func (s Square) E() Square {
 		return None
 	}
 	return s + 1
+}
+
+func (s Square) IsNone() bool {
+	return s == None
 }

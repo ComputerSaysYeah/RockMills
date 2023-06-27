@@ -61,8 +61,15 @@ func (g *gameSt) EnPassant() Square {
 	return g.enPassant
 }
 
+// Move applies the move, it does not verify the Move is valid, it applies it, for a Game it needs verifying the move is within the ValidMoves
 func (g *gameSt) Move(move Move) {
-
+	g.Board().Set(move.To(), g.Board().Get(move.From()))
+	g.Board().Set(move.From(), Empty)
+	if g.nextPlayer.Colour() == Black {
+		g.moveNo++
+	}
+	g.halfMoveNo++
+	g.nextPlayer = g.nextPlayer.Opponent()
 }
 
 func (g *gameSt) Castling() (WK, WQ, bk, bq bool) {
