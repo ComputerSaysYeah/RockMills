@@ -49,3 +49,10 @@ func TestMove(t *testing.T) {
 		}
 	}
 }
+
+func TestParseMove(t *testing.T) {
+	move := ParseMove("G1GG5")
+	if move.IsValid() {
+		t.Fatal()
+	}
+}

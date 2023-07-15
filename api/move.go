@@ -31,8 +31,8 @@ func (m Move) String() string {
 }
 
 func ParseMove(move string) Move {
-	if len(move) < 4 || len(move) > 5 {
-		return EncodeMove(None, None)
+	if len(move) < 4 || len(move) > 4 {
+		return 0xffff // absolute overflow
 	}
 	from := ParseSquare(move[0:2])
 	to := ParseSquare(move[2:4])
@@ -41,4 +41,8 @@ func ParseMove(move string) Move {
 		piece = ParsePiece(rune(move[4]))
 	}
 	return EncodeMovePromote(from, to, piece)
+}
+
+func (m Move) IsValid() bool {
+	return m != 0xffff // Promote can never have a value 16 which makes it encodable
 }

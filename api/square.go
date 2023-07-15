@@ -39,7 +39,7 @@ func (s Square) Min(o Square) Square {
 }
 
 func (s Square) Max(o Square) Square {
-	if s > 0 {
+	if s > o {
 		return s
 	}
 	return o
@@ -75,4 +75,8 @@ func (s Square) E() Square {
 
 func (s Square) IsNone() bool {
 	return s == None
+}
+
+func (s Square) IsValid() bool {
+	return !s.IsNone()
 }
