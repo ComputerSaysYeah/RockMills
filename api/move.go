@@ -31,11 +31,14 @@ func (m Move) String() string {
 }
 
 func ParseMove(move string) Move {
-	if len(move) < 4 || len(move) > 4 {
+	if len(move) < 4 || len(move) > 5 {
 		return 0xffff // absolute overflow
 	}
 	from := ParseSquare(move[0:2])
 	to := ParseSquare(move[2:4])
+	if from.IsNone() || to.IsNone() {
+		return 0xffff
+	}
 	piece := Empty
 	if len(move) == 5 {
 		piece = ParsePiece(rune(move[4]))

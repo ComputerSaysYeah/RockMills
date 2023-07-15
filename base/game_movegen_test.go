@@ -1,6 +1,7 @@
 package base
 
 import (
+	"fmt"
 	. "github.com/ComputerSaysYeah/RookMills/api"
 	"github.com/ComputerSaysYeah/RookMills/speed"
 	"testing"
@@ -81,6 +82,43 @@ func TestMoveGen_CheckMate(t *testing.T) {
 	containsMovesExactly(t, validMoves(game))
 }
 
+func TestMoveGen_Interesting(t *testing.T) {
+	game := givenGame()
+	// https://twitter.com/ChessMood/status/1678871792683741184a
+	_ = game.FromFEN("8/8/6K1/8/5p1p/5p1k/5P1P/6RR w - - 0 1")
+	containsMovesExactly(t, validMoves(game), "G6H7", "G6H6", "G6F6", "G6F7", "G6H5", "G6F5", "G6G7", "G6G5", // king moves
+		"G1A1", "G1B1", "G1C1", "G1D1", "G1E1", "G1F1", "G1G2", "G1G3", "G1G4", "G1G5") // rook moves
+	game.Move(ParseMove("G1G3"))
+	containsMovesExactly(t, validMoves(game), "F4G3", "H4G3")
+	game.Move(ParseMove("F4G3"))
+	containsMovesExactly(t, validMoves(game), "G6H7", "G6H6", "G6F6", "G6F7", "G6H5", "G6F5", "G6G7", "G6G5", // king moves,
+		"H1G1", "H1F1", "H1E1", "H1D1", "H1C1", "H1B1", "H1A1", // rook moves
+		"H2G3", "F2G3", // Pawns attacks
+	)
+	game.Move(ParseMove("H2G3"))
+	containsMovesExactly(t, validMoves(game), "H3G2", "H3G4")
+	game.Move(ParseMove("H3G2"))                                                                              // escaped
+	containsMovesExactly(t, validMoves(game), "G6H7", "G6H6", "G6F6", "G6F7", "G6H5", "G6F5", "G6G7", "G6G5", // king moves,
+		"H1G1", "H1F1", "H1E1", "H1D1", "H1C1", "H1B1", "H1A1", "H1H2", "H1H3", "H1H4", // rook moves
+		"G3G4", "G3H4", // pawn
+	)
+}
+
+func TestMoveGen_Interesting_MateIn2(t *testing.T) {
+	game := givenGame()
+	// https://twitter.com/ChessMood/status/1678871792683741184a
+	_ = game.FromFEN("8/8/6K1/8/5p1p/5p1k/5P1P/6RR w - - 0 1")
+	game.Move(ParseMove("G1G4"))
+	containsMovesExactly(t, validMoves(game), "H3G4")
+	game.Move(ParseMove("H3G4"))
+	containsMovesExactly(t, validMoves(game), "G6H7", "G6H6", "G6F6", "G6F7", "G6G7", // king moves,
+		"H1G1", "H1F1", "H1E1", "H1D1", "H1C1", "H1B1", "H1A1", // rook moves
+		"H2H3", // Pawns
+	)
+	game.Move(ParseMove("H2H3"))
+	containsMovesExactly(t, validMoves(game)) // no valid moves
+}
+
 // ---------------------------------------------------------------------------------------------------------------------------------------
 
 func givenGame() Game {
@@ -106,6 +144,9 @@ func containsMovesExactly(t *testing.T, moves map[Move]bool, expected ...string)
 func containsMoves(t *testing.T, moves map[Move]bool, expected ...string) {
 	for _, expect := range expected {
 		move := ParseMove(expect)
+		if !move.IsValid() {
+			t.Fatalf("the move %v provided in the test is not valid, check it\n", expect)
+		}
 		if !moves[move] {
 			t.Fatalf("The move %s is not contained in %v", move.String(), keys(moves))
 		}
@@ -121,6 +162,10 @@ func validMoves(game Game) map[Move]bool {
 	return movesIterToMap(movesIter)
 }
 
+func printValidMoves(game Game) {
+	fmt.Println(keys(validMoves(game)))
+}
+
 func movesIterToMap(moves speed.Iterator[Move]) map[Move]bool {
 	ans := map[Move]bool{}
 	for moves.HasNext() {
@@ -131,7 +176,7 @@ func movesIterToMap(moves speed.Iterator[Move]) map[Move]bool {
 
 func keys(moves map[Move]bool) []string {
 	var ans []string
-	for k, _ := range moves {
+	for k := range moves {
 		ans = append(ans, k.String())
 	}
 	return ans

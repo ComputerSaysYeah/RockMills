@@ -38,26 +38,26 @@ func (g *gameSt) validMovesPieceIn(square Square, piece Piece, movesIter MovesIt
 func (g *gameSt) validPawnMoves(square Square, piece Piece, iter MovesIterator) {
 	if piece.Colour() == Black && square.Row() != Row2 { // so no promotion
 		move := EncodeMove(square, square.S())
-		if g.board.Get(move.To()) == Empty {
+		if move.IsValid() && g.board.Get(move.To()).IsEmpty() {
 			if !g.wouldCheckKing(piece.Colour(), move) {
 				iter.Add(move)
 			}
 			if square.Row() == Row7 {
 				move = EncodeMove(square, move.To().S())
-				if !g.wouldCheckKing(piece.Colour(), move) {
+				if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
 					iter.Add(move)
 				}
 			}
 		}
 	} else if piece.Colour() == White && square.Row() != Row7 { // so no promotion
 		move := EncodeMove(square, square.N())
-		if g.board.Get(move.To()) == Empty {
+		if move.To().IsValid() && g.board.Get(move.To()).IsEmpty() {
 			if !g.wouldCheckKing(piece.Colour(), move) {
 				iter.Add(move)
 			}
 			if square.Row() == Row2 {
 				move = EncodeMove(square, move.To().N())
-				if !g.wouldCheckKing(piece.Colour(), move) {
+				if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
 					iter.Add(move)
 				}
 			}
@@ -74,6 +74,7 @@ func (g *gameSt) validPawnCaptures(square Square, piece Piece, iter MovesIterato
 		aEast, aWest = aEast.N(), aWest.N()
 	}
 	attacks := g.squaresIterPool.Lease()
+	defer attacks.Return()
 	attacks.Add(aWest).Add(aEast)
 	g.validGenericCapture(square, attacks, piece, iter)
 }
@@ -108,28 +109,28 @@ func (g *gameSt) validRookMovesAndCapture(square Square, piece Piece, iter Moves
 	defer targets.Return()
 	b := g.Board()
 	var s Square
-	for s = square.N(); !s.IsNone() && b.Get(s).IsEmpty(); s = s.N() {
+	for s = square.N(); s.IsValid() && b.Get(s).IsEmpty(); s = s.N() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
-	for s = square.E(); s != None && b.Get(s).IsEmpty(); s = s.E() {
+	for s = square.E(); s.IsValid() && b.Get(s).IsEmpty(); s = s.E() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
-	for s = square.S(); s != None && b.Get(s).IsEmpty(); s = s.S() {
+	for s = square.S(); s.IsValid() && b.Get(s).IsEmpty(); s = s.S() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
-	for s = square.W(); s != None && b.Get(s).IsEmpty(); s = s.W() {
+	for s = square.W(); s.IsValid() && b.Get(s).IsEmpty(); s = s.W() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
 	g.validGenericMoveAndCapture(square, targets, piece, iter)
@@ -151,28 +152,28 @@ func (g *gameSt) validBishopMovesAndCaptures(square Square, piece Piece, iter Mo
 	defer targets.Return()
 	b := g.Board()
 	var s Square
-	for s = square.N().E(); !s.IsNone() && b.Get(s).IsEmpty(); s = s.N().E() {
+	for s = square.N().E(); s.IsValid() && b.Get(s).IsEmpty(); s = s.N().E() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
-	for s = square.S().E(); s != None && b.Get(s).IsEmpty(); s = s.S().E() {
+	for s = square.S().E(); s.IsValid() && b.Get(s).IsEmpty(); s = s.S().E() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
-	for s = square.S().W(); s != None && b.Get(s).IsEmpty(); s = s.S().W() {
+	for s = square.S().W(); s.IsValid() && b.Get(s).IsEmpty(); s = s.S().W() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
-	for s = square.N().W(); s != None && b.Get(s).IsEmpty(); s = s.N().W() {
+	for s = square.N().W(); s.IsValid() && b.Get(s).IsEmpty(); s = s.N().W() {
 		targets.Add(s)
 	}
-	if !s.IsNone() && b.Get(s).Colour() == piece.Opponent() {
+	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
 		targets.Add(s)
 	}
 	g.validGenericMoveAndCapture(square, targets, piece, iter)
@@ -196,7 +197,7 @@ func (g *gameSt) validKingMovesAndCaptures(square Square, piece Piece, iter Move
 func (g *gameSt) validGenericMoveAndCapture(square Square, targets SquaresIterator, piece Piece, iter MovesIterator) {
 	for targets.HasNext() {
 		target := targets.Next()
-		if target != None && (g.board.Get(target) == Empty || g.board.Get(target).Colour() == piece.Opponent()) {
+		if !target.IsNone() && (g.board.Get(target) == Empty || g.board.Get(target).Colour() == piece.Opponent()) {
 			move := EncodeMove(square, target)
 			if !g.wouldCheckKing(piece.Colour(), move) {
 				iter.Add(move)

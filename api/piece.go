@@ -99,6 +99,8 @@ func (p Piece) King() Piece {
 	return p.Colour() + King
 }
 
+// CanAttack receives a board, and a Move and checks if the piece in the Move.From can attack Move.To i.e. if a Rook has no pieces in between, it does not
+// check the Move.To is empty or full, just answers if the Piece located at the Board's Move.From can in this board reach and attack Move.To
 func (p Piece) CanAttack(b Board, move Move) bool {
 	if p.IsPawn() {
 		return p.canPawnAttack(b, move)
@@ -112,27 +114,12 @@ func (p Piece) CanAttack(b Board, move Move) bool {
 	return false
 }
 
-func (p Piece) canPawnAttack(b Board, move Move) bool {
+func (p Piece) canPawnAttack(_ Board, move Move) bool {
 	if p.Colour() == Black {
-		to := move.From().S().W()
-		if to == move.To() && b.Get(to) == White {
-			return true
-		}
-		to = move.From().S().E()
-		if to == move.To() && b.Get(to) == White {
-			return true
-		}
+		return move.From().S().W() == move.To() || move.From().S().E() == move.To()
 	} else {
-		to := move.From().N().W()
-		if to == move.To() && b.Get(to) == Black {
-			return true
-		}
-		to = move.From().N().E()
-		if to == move.To() && b.Get(to) == Black {
-			return true
-		}
+		return move.From().N().W() == move.To() || move.From().N().E() == move.To()
 	}
-	return false
 }
 
 func (p Piece) canRookAttack(b Board, move Move) bool {

@@ -12,18 +12,18 @@ var pieces = map[Piece]rune{}
 
 func init() {
 	CRC64IsoTable = crc64.MakeTable(crc64.ISO)
-	pieces[White+Rook] = '♖'
-	pieces[White+Knight] = '♘'
-	pieces[White+Bishop] = '♗'
-	pieces[White+Queen] = '♕'
-	pieces[White+King] = '♔'
-	pieces[White+Pawn] = '♙'
-	pieces[Black+Rook] = '♜'
-	pieces[Black+Knight] = '♞'
-	pieces[Black+Bishop] = '♝'
-	pieces[Black+Queen] = '♛'
-	pieces[Black+King] = '♚'
-	pieces[Black+Pawn] = '♟'
+	pieces[Black+Rook] = '♖'
+	pieces[Black+Knight] = '♘'
+	pieces[Black+Bishop] = '♗'
+	pieces[Black+Queen] = '♕'
+	pieces[Black+King] = '♔'
+	pieces[Black+Pawn] = '♙'
+	pieces[White+Rook] = '♜'
+	pieces[White+Knight] = '♞'
+	pieces[White+Bishop] = '♝'
+	pieces[White+Queen] = '♛'
+	pieces[White+King] = '♚'
+	pieces[White+Pawn] = '♟'
 	pieces[Empty] = ' '
 }
 
