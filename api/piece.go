@@ -106,6 +106,10 @@ func (p Piece) CanAttack(b Board, move Move) bool {
 		return p.canPawnAttack(b, move)
 	} else if p.IsRook() {
 		return p.canRookAttack(b, move)
+	} else if p.IsBishop() {
+		return p.canBishopAttach(b, move)
+	} else if p.IsKnight() {
+		return p.canKnightAttach(b, move)
 	} else if p.IsQueen() {
 		return p.canQueenAttack(b, move)
 	} else if p.IsKing() {
@@ -144,32 +148,7 @@ func (p Piece) canRookAttack(b Board, move Move) bool {
 	return true
 }
 
-func (p Piece) canQueenAttack(b Board, move Move) bool {
-	// quick check, not same colour? out
-	if b.Get(move.From()).Colour() != b.Get(move.To()).Opponent() {
-		return false
-	}
-	// horizontal - vertical, like Rooks
-	if move.From().Row() == move.To().Row() || move.From().Col() == move.To().Col() {
-		j := move.From().Min(move.To())
-		k := move.From().Max(move.To())
-		if move.From().Row() == move.To().Row() {
-			for i := j + 1; i < k; i++ {
-				if b.Get(i) != Empty {
-					return false
-				}
-			}
-		} else {
-			for i := j + OneRow; i < k; i += OneRow {
-				if b.Get(i) != Empty {
-					return false
-				}
-			}
-		}
-		return true
-	}
-	// diagonals, like bishops
-	// fast check if abs(delta rows) != abs(delta cols) => no
+func (p Piece) canBishopAttach(b Board, move Move) bool {
 	if Abs8(int8(move.From().Col())-int8(move.To().Col())) != Abs8((int8(move.From().Row())-int8(move.To().Row()))/8) {
 		return false
 	}
@@ -187,8 +166,18 @@ func (p Piece) canQueenAttack(b Board, move Move) bool {
 			return false
 		}
 	}
-
 	return true
+}
+
+func (p Piece) canKnightAttach(b Board, move Move) bool {
+	return move.From().N().N().W() == move.To() || move.From().N().N().E() == move.To() ||
+		move.From().E().E().N() == move.To() || move.From().E().E().S() == move.To() ||
+		move.From().S().S().W() == move.To() || move.From().S().S().E() == move.To() ||
+		move.From().W().W().N() == move.To() || move.From().W().W().S() == move.To()
+}
+
+func (p Piece) canQueenAttack(b Board, move Move) bool {
+	return p.canRookAttack(b, move) || p.canBishopAttach(b, move)
 }
 
 func (p Piece) canKingAttack(b Board, move Move) bool {

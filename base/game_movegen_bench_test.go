@@ -76,3 +76,11 @@ func Benchmark_GenMovesStart_D4_E5_DXE5_D6_E4_D5(b *testing.B) {
 		game.ValidMoves().Return()
 	}
 }
+
+func Benchmark_GenMove_Interesting(b *testing.B) {
+	game := givenGame()
+	_ = game.FromFEN("8/5N1n/2n2k1P/8/6PN/1B2R3/8/r2Q2KR w - - 0 1")
+	for i := 0; i < b.N; i++ {
+		game.ValidMoves().Return()
+	}
+}
