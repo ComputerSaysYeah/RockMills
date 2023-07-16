@@ -52,6 +52,48 @@ func (s Square) N() Square {
 	return s + OneRow
 }
 
+func (s Square) NE() Square {
+	if s == None || s.Row() == Row8 || s.Col() == ColH {
+		return None
+	}
+	return s + OneRow + 1
+}
+
+func (s Square) EEN() Square {
+	if s == None || s.Col() >= ColG || s.Row() == Row8 {
+		return None
+	}
+	return s + 2 + OneRow
+}
+
+func (s Square) E() Square {
+	if s == None || s.Col() == ColH {
+		return None
+	}
+	return s + 1
+}
+
+func (s Square) EES() Square {
+	if s == None || s.Col() >= ColG || s.Row() == Row1 {
+		return None
+	}
+	return s + 2 - OneRow
+}
+
+func (s Square) SE() Square {
+	if s == None || s.Col() == ColH || s.Row() == Row1 {
+		return None
+	}
+	return s - OneRow + 1
+}
+
+func (s Square) SSE() Square {
+	if s == None || s.Col() == ColH || s.Row() <= 2 {
+		return None
+	}
+	return s - OneRow - OneRow + 1
+}
+
 func (s Square) S() Square {
 	if s == None || s.Row() == Row1 {
 		return None
@@ -59,18 +101,59 @@ func (s Square) S() Square {
 	return s - OneRow
 }
 
+func (s Square) SSW() Square {
+	if s == None || s.Row() <= Row2 || s.Col() == ColA {
+		return None
+	}
+	return s - OneRow - OneRow - 1
+}
+
+func (s Square) SW() Square {
+	if s == None || s.Row() == Row1 || s.Col() == ColA {
+		return None
+	}
+	return s - OneRow - 1
+}
+
+func (s Square) WWN() Square {
+	if s == None || s.Col() <= ColB || s.Row() == Row8 {
+		return None
+	}
+	return s + OneRow - 2
+}
+
 func (s Square) W() Square {
-	if s == None || s.Col() == 0 {
+	if s == None || s.Col() == ColA {
 		return None
 	}
 	return s - 1
 }
 
-func (s Square) E() Square {
-	if s == None || s.Col() == 7 {
+func (s Square) WWS() Square {
+	if s == None || s.Col() <= ColB || s.Row() == Row1 {
 		return None
 	}
-	return s + 1
+	return s - OneRow - 2
+}
+func (s Square) NW() Square {
+	if s == None || s.Col() == ColA || s.Row() == Row8 {
+		return None
+	}
+	return s - 1 + OneRow
+}
+
+func (s Square) NNW() Square {
+	if s == None || s.Col() == ColA || s.Row() >= Row7 {
+		return None
+	}
+	return s - 1 + OneRow + OneRow
+}
+
+func (s Square) NNE() Square {
+	if s == None || s.Col() == ColH || s.Row() >= Row7 {
+		return None
+	}
+	return s + 1 + OneRow + OneRow
 }
 
 func (s Square) IsNone() bool {

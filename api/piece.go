@@ -120,9 +120,9 @@ func (p Piece) CanAttack(b Board, move Move) bool {
 
 func (p Piece) canPawnAttack(_ Board, move Move) bool {
 	if p.Colour() == Black {
-		return move.From().S().W() == move.To() || move.From().S().E() == move.To()
+		return move.From().SW() == move.To() || move.From().SE() == move.To()
 	} else {
-		return move.From().N().W() == move.To() || move.From().N().E() == move.To()
+		return move.From().NW() == move.To() || move.From().NE() == move.To()
 	}
 }
 
@@ -170,10 +170,10 @@ func (p Piece) canBishopAttach(b Board, move Move) bool {
 }
 
 func (p Piece) canKnightAttach(b Board, move Move) bool {
-	return move.From().N().N().W() == move.To() || move.From().N().N().E() == move.To() ||
-		move.From().E().E().N() == move.To() || move.From().E().E().S() == move.To() ||
-		move.From().S().S().W() == move.To() || move.From().S().S().E() == move.To() ||
-		move.From().W().W().N() == move.To() || move.From().W().W().S() == move.To()
+	return move.From().NNW() == move.To() || move.From().NNE() == move.To() ||
+		move.From().EEN() == move.To() || move.From().EES() == move.To() ||
+		move.From().SSW() == move.To() || move.From().SSE() == move.To() ||
+		move.From().WWN() == move.To() || move.From().WWS() == move.To()
 }
 
 func (p Piece) canQueenAttack(b Board, move Move) bool {

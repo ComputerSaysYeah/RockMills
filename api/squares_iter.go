@@ -9,6 +9,7 @@ type SquaresIterator interface {
 	speed.Iterator[Square]
 	speed.Recyclable
 	Add(Square) SquaresIterator
+	AddIfValid(Square) SquaresIterator
 }
 
 type squaresIter struct {
@@ -45,5 +46,12 @@ func (s *squaresIter) Add(square Square) SquaresIterator {
 		s.squares.ExpandBy(s.squares.Capacity())
 	}
 	s.squares.Push(square)
+	return s
+}
+
+func (s *squaresIter) AddIfValid(square Square) SquaresIterator {
+	if square.IsValid() {
+		s.Add(square)
+	}
 	return s
 }
