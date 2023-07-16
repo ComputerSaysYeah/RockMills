@@ -177,9 +177,9 @@ func TestMoveGen_Interesting3(t *testing.T) {
 
 func givenGame() Game {
 	return NewGame(
-		speed.NewLeanPool(16, NewBoardB),
-		speed.NewLeanPool(16, NewMovesIterator),
-		speed.NewLeanPool(32, NewSquaresIterator))
+		speed.NewLeanPool(2, NewBoardB),
+		speed.NewLeanPool(2, NewMovesIterator),
+		speed.NewLeanPool(2, NewSquaresIterator))
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------------

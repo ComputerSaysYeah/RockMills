@@ -38,30 +38,38 @@ func (g *gameSt) validMovesPieceIn(square Square, piece Piece, movesIter MovesIt
 func (g *gameSt) validPawnMoves(square Square, piece Piece, iter MovesIterator) {
 	if piece.Colour() == Black {
 		if square.Row() != Row2 { // so no promotion
-			move := EncodeMove(square, square.S())
-			if g.board.Get(move.To()).IsEmpty() {
+			target := square.S()
+			if g.board.Get(target).IsEmpty() {
+				move := EncodeMove(square, target)
 				if !g.wouldCheckKing(piece.Colour(), move) {
 					iter.Add(move)
 				}
 				if square.Row() == Row7 {
-					move = EncodeMove(square, move.To().S())
-					if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
-						iter.Add(move)
+					target = target.S()
+					if g.board.Get(target).IsEmpty() {
+						move = EncodeMove(square, target)
+						if !g.wouldCheckKing(piece.Colour(), move) {
+							iter.Add(move)
+						}
 					}
 				}
 			}
 		}
 		// white
 	} else if square.Row() != Row7 { // so no promotion
-		move := EncodeMove(square, square.N())
-		if g.board.Get(move.To()).IsEmpty() {
+		target := square.N()
+		if g.board.Get(target).IsEmpty() {
+			move := EncodeMove(square, target)
 			if !g.wouldCheckKing(piece.Colour(), move) {
 				iter.Add(move)
 			}
 			if square.Row() == Row2 {
-				move = EncodeMove(square, move.To().N())
-				if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
-					iter.Add(move)
+				target = target.N()
+				if g.board.Get(target).IsEmpty() {
+					move = EncodeMove(square, target)
+					if !g.wouldCheckKing(piece.Colour(), move) {
+						iter.Add(move)
+					}
 				}
 			}
 		}
