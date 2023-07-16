@@ -36,20 +36,23 @@ func (g *gameSt) validMovesPieceIn(square Square, piece Piece, movesIter MovesIt
 }
 
 func (g *gameSt) validPawnMoves(square Square, piece Piece, iter MovesIterator) {
-	if piece.Colour() == Black && square.Row() != Row2 { // so no promotion
-		move := EncodeMove(square, square.S())
-		if g.board.Get(move.To()).IsEmpty() {
-			if !g.wouldCheckKing(piece.Colour(), move) {
-				iter.Add(move)
-			}
-			if square.Row() == Row7 {
-				move = EncodeMove(square, move.To().S())
-				if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
+	if piece.Colour() == Black {
+		if square.Row() != Row2 { // so no promotion
+			move := EncodeMove(square, square.S())
+			if g.board.Get(move.To()).IsEmpty() {
+				if !g.wouldCheckKing(piece.Colour(), move) {
 					iter.Add(move)
+				}
+				if square.Row() == Row7 {
+					move = EncodeMove(square, move.To().S())
+					if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
+						iter.Add(move)
+					}
 				}
 			}
 		}
-	} else if piece.Colour() == White && square.Row() != Row7 { // so no promotion
+		// white
+	} else if square.Row() != Row7 { // so no promotion
 		move := EncodeMove(square, square.N())
 		if g.board.Get(move.To()).IsEmpty() {
 			if !g.wouldCheckKing(piece.Colour(), move) {
@@ -67,21 +70,20 @@ func (g *gameSt) validPawnMoves(square Square, piece Piece, iter MovesIterator) 
 
 func (g *gameSt) validPawnCaptures(square Square, piece Piece, iter MovesIterator) {
 	//XXX: en-passant here
-	attacks := g.squaresIterPool.Lease()
-	defer attacks.Return()
 	if piece.Colour() == Black {
-		attacks.AddIfValid(square.SE()).AddIfValid(square.SW())
+		g.validCapture(square, square.SE(), piece, iter)
+		g.validCapture(square, square.SW(), piece, iter)
 	} else {
-		attacks.AddIfValid(square.NE()).AddIfValid(square.NW())
+		g.validCapture(square, square.NE(), piece, iter)
+		g.validCapture(square, square.NW(), piece, iter)
 	}
-	g.validGenericCapture(square, attacks, piece, iter)
 }
 
 func (g *gameSt) validPawnPromotes(square Square, piece Piece, iter MovesIterator) {
 	if piece.Colour() == Black {
-		move := EncodeMove(square, square.S())
-		if square.Row() == Row2 && g.board.Get(move.To()).IsEmpty() {
-			if !g.wouldCheckKing(piece.Colour(), move) {
+		if square.Row() == Row2 {
+			move := EncodeMove(square, square.S())
+			if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
 				iter.Add(EncodeMovePromote(move.From(), move.To(), Queen))
 				iter.Add(EncodeMovePromote(move.From(), move.To(), Rook))
 				iter.Add(EncodeMovePromote(move.From(), move.To(), Bishop))
@@ -89,49 +91,45 @@ func (g *gameSt) validPawnPromotes(square Square, piece Piece, iter MovesIterato
 			}
 		}
 	} else {
-		move := EncodeMove(square, square.N())
-		if square.Row() == Row7 && g.board.Get(move.To()).IsEmpty() {
-			if !g.wouldCheckKing(piece.Colour(), move) {
+		if square.Row() == Row7 {
+			move := EncodeMove(square, square.N())
+			if g.board.Get(move.To()).IsEmpty() && !g.wouldCheckKing(piece.Colour(), move) {
 				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Queen))
 				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Rook))
 				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Bishop))
 				iter.Add(EncodeMovePromote(move.From(), move.To(), White+Knight))
-
 			}
 		}
 	}
 }
 
 func (g *gameSt) validRookMovesAndCapture(square Square, piece Piece, iter MovesIterator) {
-	targets := g.squaresIterPool.Lease()
-	defer targets.Return()
 	b := g.Board()
 	var s Square
 	for s = square.N(); s.IsValid() && b.Get(s).IsEmpty(); s = s.N() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
 	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
 	for s = square.E(); s.IsValid() && b.Get(s).IsEmpty(); s = s.E() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
 	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
 	for s = square.S(); s.IsValid() && b.Get(s).IsEmpty(); s = s.S() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
 	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
 	for s = square.W(); s.IsValid() && b.Get(s).IsEmpty(); s = s.W() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
 	if s.IsValid() && b.Get(s).Colour() == piece.Opponent() {
-		targets.Add(s)
+		g.validMoveCapture(square, s, piece, iter)
 	}
-	g.validGenericMoveAndCapture(square, targets, piece, iter)
 }
 
 func (g *gameSt) validKnightMovesAndCaptures(square Square, piece Piece, iter MovesIterator) {
@@ -194,27 +192,13 @@ func (g *gameSt) validMoveCapture(from Square, target Square, piece Piece, iter 
 	}
 }
 
-func (g *gameSt) validGenericMoveAndCapture(from Square, targets SquaresIterator, piece Piece, iter MovesIterator) {
-	for targets.HasNext() {
-		target := targets.Next()
-		g.validMoveCapture(from, target, piece, iter)
-	}
-}
-
-func (g *gameSt) validGenericCapture(square Square, targets SquaresIterator, piece Piece, iter MovesIterator) {
-	for targets.HasNext() {
-		target := targets.Next()
-		if !target.IsNone() && !g.board.Get(target).IsEmpty() && g.board.Get(target).Colour() == piece.Opponent() {
-			move := EncodeMove(square, target)
-			if !g.wouldCheckKing(piece.Colour(), move) {
-				iter.Add(move)
-			}
+func (g *gameSt) validCapture(square Square, target Square, piece Piece, iter MovesIterator) {
+	if !target.IsNone() && !g.board.Get(target).IsEmpty() && g.board.Get(target).Colour() == piece.Opponent() {
+		move := EncodeMove(square, target)
+		if !g.wouldCheckKing(piece.Colour(), move) {
+			iter.Add(move)
 		}
 	}
-}
-
-func (g *gameSt) validKingCaptures(square Square, piece Piece, iter MovesIterator) {
-
 }
 
 func (g *gameSt) wouldCheckKing(kingColour Piece, move Move) bool {
@@ -235,14 +219,7 @@ func (g *gameSt) wouldCheckKing(kingColour Piece, move Move) bool {
 	}
 	b.Set(move.From(), Empty)
 
-	// find the King
-	kingPiece := kingColour.King()
-	kingSquare := None
-	for s := A1; s < H8 && kingSquare == None; s++ {
-		if b.Get(s) == kingPiece {
-			kingSquare = s
-		}
-	}
+	kingSquare := b.KingSquare(kingColour)
 	if kingSquare.IsNone() {
 		return false
 	}

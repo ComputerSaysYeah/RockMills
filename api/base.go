@@ -53,6 +53,7 @@ type Board interface {
 	CopyFrom(Board)
 	Hash() uint64
 	SetStartingPieces()
+	KingSquare(Piece) Square
 	String() string
 }
 

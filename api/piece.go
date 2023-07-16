@@ -170,6 +170,9 @@ func (p Piece) canBishopAttach(b Board, move Move) bool {
 }
 
 func (p Piece) canKnightAttach(b Board, move Move) bool {
+	if move.Manhattan() != 3 {
+		return false
+	}
 	return move.From().NNW() == move.To() || move.From().NNE() == move.To() ||
 		move.From().EEN() == move.To() || move.From().EES() == move.To() ||
 		move.From().SSW() == move.To() || move.From().SSE() == move.To() ||
@@ -181,9 +184,6 @@ func (p Piece) canQueenAttack(b Board, move Move) bool {
 }
 
 func (p Piece) canKingAttack(b Board, move Move) bool {
-	if b.Get(move.From()).Colour() != b.Get(move.To()).Opponent() {
-		return false
-	}
 	return Abs8(int8(move.From().Row())-int8(move.To().Row())) <= 8 && Abs8(int8(move.From().Col())-int8(move.To().Col())) <= 1
 }
 

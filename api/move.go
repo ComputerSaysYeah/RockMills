@@ -49,3 +49,7 @@ func ParseMove(move string) Move {
 func (m Move) IsValid() bool {
 	return m != 0xffff // Promote can never have a value 16 which makes it encodable
 }
+
+func (m Move) Manhattan() int8 {
+	return Abs8(int8(m.To().Row()/OneRow)-int8(m.From().Row()/OneRow)) + Abs8(int8(m.To().Col())-int8(m.From().Col()))
+}

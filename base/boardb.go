@@ -28,12 +28,14 @@ func init() {
 }
 
 type BoardB struct {
-	squares  [64]Piece
-	returner func(any)
+	squares   [64]Piece
+	blackKing Square
+	whiteKing Square
+	returner  func(any)
 }
 
 func NewBoardB() Board {
-	return &BoardB{squares: [64]Piece{}, returner: nil}
+	return &BoardB{squares: [64]Piece{}, blackKing: None, whiteKing: None, returner: nil}
 }
 
 func (b *BoardB) Get(s Square) Piece {
@@ -41,6 +43,11 @@ func (b *BoardB) Get(s Square) Piece {
 }
 
 func (b *BoardB) Set(s Square, p Piece) {
+	if p == White+King {
+		b.whiteKing = s
+	} else if p == Black+King {
+		b.blackKing = s
+	}
 	b.squares[s] = p
 }
 
@@ -111,6 +118,8 @@ func (b *BoardB) String() string {
 
 func (b *BoardB) CopyFrom(o Board) {
 	copy(b.squares[:], o.(*BoardB).squares[:])
+	b.blackKing = o.(*BoardB).blackKing
+	b.whiteKing = o.(*BoardB).whiteKing
 }
 
 func (b *BoardB) Reset() {
@@ -121,6 +130,8 @@ func (b *BoardB) Reset() {
 	copy(b.squares[8:], b.squares[0:8])
 	copy(b.squares[16:], b.squares[0:16])
 	copy(b.squares[32:], b.squares[0:32])
+	b.blackKing = None
+	b.whiteKing = None
 	//for i := 0; i < len(b.squares); i++ {
 	//	b.squares[i] = Empty
 	//}
@@ -133,4 +144,12 @@ func (b *BoardB) Return() {
 
 func (b *BoardB) SetReturnerFn(returner func(any)) {
 	b.returner = returner
+}
+
+func (b *BoardB) KingSquare(color Piece) Square {
+	if color == White {
+		return b.whiteKing
+	} else {
+		return b.blackKing
+	}
 }

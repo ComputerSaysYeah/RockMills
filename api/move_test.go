@@ -56,3 +56,21 @@ func TestParseMove(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+func TestMove_ManhattanDistance(t *testing.T) {
+	if ParseMove("A1A8").Manhattan() != 7 {
+		t.Fatal(ParseMove("A1A8").Manhattan())
+	}
+	if ParseMove("A1H8").Manhattan() != 14 {
+		t.Fatal()
+	}
+	if ParseMove("A8A1").Manhattan() != 7 {
+		t.Fatal()
+	}
+	if ParseMove("H1A8").Manhattan() != 14 {
+		t.Fatal()
+	}
+	if ParseMove("D4E4").Manhattan() != 1 {
+		t.Fatal(ParseMove("D4E4").Manhattan())
+	}
+}
