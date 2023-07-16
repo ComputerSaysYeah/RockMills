@@ -2,6 +2,7 @@ package base
 
 import (
 	. "github.com/ComputerSaysYeah/RookMills/api"
+	"github.com/ComputerSaysYeah/RookMills/speed"
 	"testing"
 )
 
@@ -83,4 +84,35 @@ func Benchmark_GenMove_Interesting(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		game.ValidMoves().Return()
 	}
+}
+
+func Benchmark_GenMove_FromStart_Depth4(b *testing.B) {
+	b.ReportAllocs()
+	gamePool := speed.NewLeanPool(64, givenGame)
+	game := gamePool.Lease()
+	total := 0
+	for i := 0; i < b.N; i++ {
+		nodes := goDepth(game, gamePool, 4)
+		b.ReportMetric(float64(nodes), "nodes/op")
+		total += nodes
+	}
+	b.ReportMetric(float64(total), "nodes")
+}
+
+func goDepth(game Game, gamePool speed.Pool[Game], depth int) int {
+	if depth == 0 {
+		return 0
+	}
+	nodes := 0
+	moves := game.ValidMoves()
+	for moves.HasNext() {
+		subGame := gamePool.Lease()
+		subGame.CopyFrom(game)
+		subGame.Move(moves.Next())
+		nodes++
+		nodes += goDepth(subGame, gamePool, depth-1)
+		subGame.Return()
+	}
+	moves.Return()
+	return nodes
 }

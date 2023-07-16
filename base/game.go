@@ -42,7 +42,7 @@ func NewGame(boardPool speed.Pool[Board],
 }
 
 func (g *gameSt) Reset() {
-	g.board.SetStartingPieces()
+	g.board.SetStartingPieces() //XXX see if we can avoid this on each node exploration
 	g.moveNo = 1
 	g.halfMoveNo = 0
 	g.WK, g.WQ, g.bk, g.bq = true, true, true, true
@@ -118,4 +118,13 @@ func (g *gameSt) SetCastling(WK, WQ, bk, bq bool) {
 	g.WQ = WQ
 	g.bk = bk
 	g.bq = bq
+}
+
+func (g *gameSt) CopyFrom(o Game) {
+	g.board.CopyFrom(o.Board())
+	g.moveNo = o.MoveNo()
+	g.halfMoveNo = o.HalfMoveNo()
+	g.nextPlayer = o.MoveNext()
+	g.enPassant = o.EnPassant()
+	g.SetCastling(o.Castling())
 }

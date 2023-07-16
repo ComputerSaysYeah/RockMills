@@ -88,7 +88,7 @@ func (s Square) SE() Square {
 }
 
 func (s Square) SSE() Square {
-	if s == None || s.Col() == ColH || s.Row() <= 2 {
+	if s == None || s.Col() == ColH || s.Row() <= Row2 {
 		return None
 	}
 	return s - OneRow - OneRow + 1

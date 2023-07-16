@@ -76,4 +76,6 @@ type Game interface {
 
 	ToFEN() string
 	FromFEN(string) error
+
+	CopyFrom(Game)
 }
