@@ -67,8 +67,29 @@ func (g *gameSt) EnPassant() Square {
 
 // Move applies the move, it does not verify the Move is valid, it applies it, for a Game it needs verifying the move is within the ValidMoves
 func (g *gameSt) Move(move Move) {
+
 	if move.Promote().IsEmpty() {
-		g.Board().Set(move.To(), g.Board().Get(move.From()))
+		piece := g.Board().Get(move.From())
+		g.Board().Set(move.To(), piece)
+		if piece.IsPawn() {
+			if g.enPassant == move.To() {
+				if piece.Colour() == Black {
+					g.Board().Set(move.To().N(), Empty)
+				} else {
+					g.Board().Set(move.To().S(), Empty)
+				}
+			} else if move.Manhattan() == 2 && move.From().Col() == move.To().Col() {
+				if piece.Colour() == Black && move.From().Row() == Row7 {
+					g.enPassant = move.To().N()
+				}
+				if piece.Colour() == White && move.From().Row() == Row2 {
+					g.enPassant = move.To().S()
+				}
+			} else {
+				g.enPassant = None
+			}
+		}
+
 	} else {
 		g.Board().Set(move.To(), move.Promote())
 	}

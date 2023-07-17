@@ -17,7 +17,6 @@ func (g *gameSt) ValidMoves() MovesIterator {
 
 func (g *gameSt) validMovesPieceIn(square Square, piece Piece, movesIter MovesIterator) {
 	if piece.IsPawn() {
-		//XXX: DEAL with EnPassant
 		g.validPawnMoves(square, piece, movesIter)
 		g.validPawnCaptures(square, piece, movesIter)
 		g.validPawnPromotes(square, piece, movesIter)
@@ -81,9 +80,19 @@ func (g *gameSt) validPawnCaptures(square Square, piece Piece, iter MovesIterato
 	if piece.Colour() == Black {
 		g.validCapture(square, piece, square.SE(), iter)
 		g.validCapture(square, piece, square.SW(), iter)
+		if g.enPassant.IsValid() {
+			if g.enPassant == square.SE() || g.enPassant == square.SW() {
+				iter.Add(EncodeMove(square, g.enPassant))
+			}
+		}
 	} else {
 		g.validCapture(square, piece, square.NE(), iter)
 		g.validCapture(square, piece, square.NW(), iter)
+		if g.enPassant.IsValid() {
+			if g.enPassant == square.NE() || g.enPassant == square.NW() {
+				iter.Add(EncodeMove(square, g.enPassant))
+			}
+		}
 	}
 }
 
@@ -223,13 +232,33 @@ func (g *gameSt) wouldCheckKing(kingColour Piece, move Move) bool {
 
 	origFromPiece := b.Get(move.From())
 	origToPiece := b.Get(move.To())
+	didEnPassant := Empty
 	defer func() {
 		b.Set(move.From(), origFromPiece)
 		b.Set(move.To(), origToPiece)
+		if didEnPassant != Empty {
+			if didEnPassant.Colour() == Black {
+				g.board.Set(move.To().N(), White+Pawn)
+			} else {
+				g.board.Set(move.To().S(), Pawn)
+			}
+		}
 	}()
 
 	if move.Promote().IsEmpty() {
-		b.Set(move.To(), b.Get(move.From()))
+		piece := b.Get(move.From())
+		b.Set(move.To(), piece)
+		if piece.IsPawn() {
+			if g.enPassant == move.To() {
+				if piece.Colour() == Black {
+					g.Board().Set(move.To().N(), Empty)
+					didEnPassant = Black
+				} else {
+					g.Board().Set(move.To().S(), Empty)
+					didEnPassant = White
+				}
+			}
+		}
 	} else {
 		b.Set(move.To(), move.Promote())
 	}

@@ -173,6 +173,28 @@ func TestMoveGen_Interesting3(t *testing.T) {
 	containsMovesExactly(t, validMoves(game)) // CheckMate - no valid moves
 }
 
+func TestMoveGen_EnPassant(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("8/8/8/8/4p3/8/3P4/8 w - - 0 1")
+	containsMovesExactly(t, validMoves(game), "D2D4", "D2D3")
+	game.Move(ParseMove("D2D4"))
+	containsMovesExactly(t, validMoves(game), "E4D3", "E4D3")
+	game.Move(ParseMove("E4D3"))              // en passant ate
+	containsMovesExactly(t, validMoves(game)) // no valid moves as there should be no Pawn anymore
+}
+
+func TestMoveGen_EnPassant_LastsOneMove(t *testing.T) {
+	game := givenGame()
+	_ = game.FromFEN("8/7p/8/8/4p3/8/P2P4/8 w - - 0 1")
+	containsMovesExactly(t, validMoves(game), "A2A4", "A2A3", "D2D4", "D2D3")
+	game.Move(ParseMove("D2D4"))
+	containsMovesExactly(t, validMoves(game), "H7H6", "H7H5", "E4E3", "E4D3")
+	game.Move(ParseMove("H7H6")) // ignores en-passant
+	containsMovesExactly(t, validMoves(game), "D4D5", "A2A4", "A2A3")
+	game.Move(ParseMove("A2A3"))
+	containsMovesExactly(t, validMoves(game), "H6H5", "E4E3") // en-passant is not an option anymore
+}
+
 // ---------------------------------------------------------------------------------------------------------------------------------------
 
 func givenGame() Game {
